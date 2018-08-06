@@ -16,4 +16,12 @@ urlpatterns = [
   url(r'^events/$', views.events, name='events'),
   # Contacts view ('/tutorial/contacts/')
   url(r'^contacts/$', views.contacts, name='contacts'),
+
+  url(r'^rooms/$', views.rooms, name='rooms'),
+
+  url(r'^events/create/$', views.create_events, name='create_events'),
+
+  url(r'^message/$', views.send_message, name='send_message'),
+
+  url(r'^skype/$', views.skype_login, name='skype_login')
 ]

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from tutorial.authhelper import get_signin_url, get_token_from_code, get_access_token
-from tutorial.outlookservice import get_me, get_my_messages, get_my_events, get_my_contacts
+from tutorial.outlookservice import get_me, get_my_messages, get_my_events, get_my_contacts, get_my_rooms, post_my_events, post_send_message
 import time
 
 # Create your views here.
@@ -47,6 +47,7 @@ def mail(request):
     return render(request, 'tutorial/mail.html', context)
     
 def events(request):
+  import ipdb;ipdb.set_trace()
   access_token = get_access_token(request, request.build_absolute_uri(reverse('tutorial:gettoken')))
   # If there is no token in the session, redirect to home
   if not access_token:
@@ -65,3 +66,74 @@ def contacts(request):
     contacts = get_my_contacts(access_token)
     context = { 'contacts': contacts['value'] }
     return render(request, 'tutorial/contacts.html', context)
+
+
+def findmeetings(request):
+  access_token = get_access_token(request, request.build_absolute_uri(reverse('tutorial:gettoken')))
+  if not access_token:
+    return HttpResponseRedirect(reverse('tutorial:home'))
+  else:
+    meetings = post_find_meetings(access_token)
+    context = { 'contacts': meetings['value'] }
+    return render(request, 'tutorial/contacts.html', context)
+
+def rooms(request):
+  access_token = get_access_token(request, request.build_absolute_uri(reverse('tutorial:gettoken')))
+  if not access_token:
+    return HttpResponseRedirect(reverse('tutorial:home'))
+  else:
+    rooms = get_my_rooms(access_token)
+    context = { 'contacts': rooms['value'] }
+    return render(request, 'tutorial/contacts.html', context)
+
+def create_events(request):
+  access_token = get_access_token(request, request.build_absolute_uri(reverse('tutorial:gettoken')))
+  if not access_token:
+    return HttpResponseRedirect(reverse('tutorial:home'))
+  else:
+    events = post_my_events(access_token)
+    context = { 'contacts': events['value'] }
+    return render(request, 'tutorial/contacts.html', context)
+
+def send_message(request):
+  import ipdb;ipdb.set_trace()
+  access_token = get_access_token(request, request.build_absolute_uri(reverse('tutorial:gettoken')))
+  if not access_token:
+    return HttpResponseRedirect(reverse('tutorial:home'))
+  else:
+    events = post_send_message(access_token)
+    context = { 'contacts': events['value'] }
+    return render(request, 'tutorial/contacts.html', context)
+
+
+def skype_login(request):
+  import requests
+  import requests.auth as auth
+  import json
+
+  url = "https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token"
+  headers = {'Content-Type' : 'application/x-www-form-urlencoded', 'Host' : 'login.microsoftonline.com' }
+
+
+  query_parameters = {
+                      "grant_type": "client_credentials",
+                      "client_id" : "6d0027b4-3198-4e7c-a22d-61cbc76b2fb3",
+                      "client_secret": "zceMNEQQI190{{pekoY96+^",
+                      "scope": "https://api.botframework.com/.default"
+                    }
+
+  # params = "grant_type=client_credentials&client_id=%s&client_secret=%s&scope=https%3A%2F%2Fapi.botframework.com%2F.default" %("6d0027b4-3198-4e7c-a22d-61cbc76b2fb3", "zceMNEQQI190{{pekoY96+^")
+  r = requests.post(url, data=query_parameters)
+  print(r.content)
+
+  jsonAuth = json.loads(r.content.decode('utf-8'))
+
+  print(jsonAuth['token_type'] + ' ' + jsonAuth['access_token'])
+
+  headers2 = {'Authorization' : 'Bearer ' + jsonAuth['access_token'], 'Content-Type':'application/json' }
+
+  url='https://smba.trafficmanager.net/apis/v3/conversations/8:roshinraj007/members'
+
+  req = requests.get(url, headers=headers2)
+
+  print(req.content)

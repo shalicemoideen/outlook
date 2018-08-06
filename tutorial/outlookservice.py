@@ -3,7 +3,9 @@ import requests
 import uuid
 import json
 
-graph_endpoint = 'https://graph.microsoft.com/v1.0{0}'
+# graph_endpoint = 'https://graph.microsoft.com/v1.0{0}'
+# graph_endpoint = 'https://outlook.office.com/api/v1.0{0}'
+graph_endpoint = 'https://outlook.office.com/api/beta{0}'
 
 # Generic API Sending
 def make_api_call(method, url, token, payload = None, parameters = None):
@@ -22,7 +24,7 @@ def make_api_call(method, url, token, payload = None, parameters = None):
     headers.update(instrumentation)
     
     response = None
-    
+    import ipdb;ipdb.set_trace()
     if (method.upper() == 'GET'):
         response = requests.get(url, headers = headers, params = parameters)
     elif (method.upper() == 'DELETE'):
@@ -77,7 +79,8 @@ def get_my_events(access_token):
   #  - Sort the results by the Start field in ascending order
   query_parameters = {'$top': '10',
                       '$select': 'subject,start,end',
-                      '$orderby': 'start/dateTime ASC'}
+                      # '$orderby': 'start/dateTime ASC'
+                     }
                       
   r = make_api_call('GET', get_events_url, access_token, parameters = query_parameters)
   
@@ -96,8 +99,94 @@ def get_my_contacts(access_token):
   query_parameters = {'$top': '10',
                       '$select': 'givenName,surname,emailAddresses',
                       '$orderby': 'givenName ASC'}
-                      
+                        
   r = make_api_call('GET', get_contacts_url, access_token, parameters = query_parameters)
+  
+  if (r.status_code == requests.codes.ok):
+    return r.json()
+  else:
+    return "{0}: {1}".format(r.status_code, r.text)
+
+def get_my_rooms(access_token):
+  get_contacts_url = graph_endpoint.format('/me/findrooms')
+  
+  # Use OData query parameters to control the results
+  #  - Only first 10 results returned
+  #  - Only return the GivenName, Surname, and EmailAddresses fields
+  #  - Sort the results by the GivenName field in ascending order
+  query_parameters = {'$top': '10',
+                      '$select': 'givenName,surname,emailAddresses',
+                      '$orderby': 'givenName ASC'}
+  import ipdb;ipdb.set_trace()               
+  r = make_api_call('GET', get_contacts_url, access_token)
+  
+  if (r.status_code == requests.codes.ok):
+    return r.json()
+  else:
+    return "{0}: {1}".format(r.status_code, r.text)
+
+def post_find_meetings(access_token):
+  post_meetings_url = graph_endpoint.format('/me/findmeetingtimes')
+
+def post_my_events(access_token):
+  get_events_url = graph_endpoint.format('/me/events')
+
+  query_parameters = {
+                    "Subject": "Plan summer company picnic",
+                    "Body": {
+                      "ContentType": "HTML",
+                      "Content": "Let's kick-start this event planning!"
+                    },
+                    "Start": {
+                        "DateTime": "2018-07-22T11:00:00",
+                        "TimeZone": "India Standard Time"
+                    },
+                    "End": {
+                        "DateTime": "2018-07-22T12:00:00",
+                        "TimeZone": "India Standard Time"
+                    },
+                    "Attendees": [
+                      {
+                        "EmailAddress": {
+                          "Address": "sujith.suthan@marlabs.com",
+                          "Name": "Sujith Suthan"
+                        },
+                        "Type": "Required"
+                      }
+                    ],
+                    "Location": {
+                      "DisplayName": "KochiConf1",
+                      "LocationType": "Default"
+                    },
+                  }
+  r = make_api_call('POST', get_events_url, access_token, payload =query_parameters)
+  
+  if (r.status_code == requests.codes.ok):
+    return r.json()
+  else:
+    return "{0}: {1}".format(r.status_code, r.text)
+
+def post_send_message(access_token):
+  get_message_url = graph_endpoint.format('/me/sendmail')
+
+  query_parameters = {
+                      "Message": {
+                        "Subject": "Meet for lunch?",
+                        "Body": {
+                          "ContentType": "Text",
+                          "Content": "The new cafeteria is open."
+                        },
+                        "ToRecipients": [
+                          {
+                            "EmailAddress": {
+                              "Address": "roshin.raj@marlabs.com"
+                            }
+                          }
+                        ],
+                      },
+                      "SaveToSentItems": "false"
+                    }
+  r = make_api_call('POST', get_message_url, access_token, payload =query_parameters)
   
   if (r.status_code == requests.codes.ok):
     return r.json()

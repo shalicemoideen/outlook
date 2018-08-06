@@ -6,8 +6,11 @@ import json
 import time
 
 # Client ID and secret
-client_id = 'YOUR APP ID HERE'
-client_secret = 'YOUR APP PASSWORD HERE'
+# client_id = '8feb10fb-5cf3-4adc-b681-0f5aac9ae13a'
+# client_secret = 'naflDEI550#+vjfQGJN95=@'
+
+client_id = '5d69d99f-d540-4c0e-a4d8-95b03d34604f'
+client_secret = 'ikiMKP67@?;gjmmJZAB675;'
 
 # Constant strings for OAuth2 flow
 # The OAuth authority
@@ -23,8 +26,11 @@ token_url = '{0}{1}'.format(authority, '/common/oauth2/v2.0/token')
 scopes = [ 'openid',
            'offline_access',
            'User.Read',
+           'User.ReadBasic.All',
            'Mail.Read',
+           'Mail.Send',
            'Calendars.Read',
+           'Calendars.ReadWrite',
            'Contacts.Read' ]
 
 def get_signin_url(redirect_uri):
