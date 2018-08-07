@@ -4,8 +4,8 @@ import uuid
 import json
 
 # graph_endpoint = 'https://graph.microsoft.com/v1.0{0}'
-# graph_endpoint = 'https://outlook.office.com/api/v1.0{0}'
-graph_endpoint = 'https://outlook.office.com/api/beta{0}'
+graph_endpoint = 'https://outlook.office.com/api/v1.0{0}'
+# graph_endpoint = 'https://outlook.office.com/api/beta{0}'
 
 # Generic API Sending
 def make_api_call(method, url, token, payload = None, parameters = None):
