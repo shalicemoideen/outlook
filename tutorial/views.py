@@ -5,18 +5,21 @@ from django.urls import reverse
 from tutorial.authhelper import get_signin_url, get_token_from_code, get_access_token
 from tutorial.outlookservice import get_me, get_my_messages, get_my_events, get_my_contacts, get_my_rooms, post_my_events, post_send_message
 import time
+from django.conf import settings
 
 # Create your views here.
 
 def home(request):
-  redirect_uri = request.build_absolute_uri(reverse('tutorial:gettoken'))
+  # redirect_uri = request.build_absolute_uri(reverse('tutorial:gettoken'))
+  redirect_uri = settings.BASE_URL
   sign_in_url = get_signin_url(redirect_uri)
   context = { 'signin_url': sign_in_url }
   return render(request, 'tutorial/home.html', context)
   
 def gettoken(request):
   auth_code = request.GET['code']
-  redirect_uri = request.build_absolute_uri(reverse('tutorial:gettoken'))
+  # redirect_uri = request.build_absolute_uri(reverse('tutorial:gettoken'))
+  redirect_uri = settings.BASE_URL
   token = get_token_from_code(auth_code, redirect_uri)
   access_token = token['access_token']
   user = get_me(access_token)
